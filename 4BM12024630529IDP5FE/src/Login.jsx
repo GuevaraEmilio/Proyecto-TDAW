@@ -1,0 +1,98 @@
+import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+function Login() {
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = () => {
+    fetch(`http://localhost:9999/?User=${user}&password=${password}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "yes") {
+          toast.success(`Bienvenido, tipo de usuario: ${data.tipo}`, {
+            position: "top-center",
+            autoClose: 3000,
+          });
+        } else {
+          toast.error("Usuario o contraseña incorrectos.", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+          setUser("");
+          setPassword("");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Error al conectar con el servidor.", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+      });
+  };
+
+  return (
+    <div
+      style={{
+        backgroundImage: 'url("/media/oceano.png")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          padding: "40px",
+          borderRadius: "10px",
+          boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)",
+          textAlign: "center"//,
+          //width: "300px",
+        }}
+      >
+        <h2>Iniciar sesión</h2>
+        <p>
+          <strong>Proyecto: Videojuego controlado por voz</strong>
+        </p>
+        <div style={{ fontSize: "14px", marginBottom: "10px" }}>
+          <table border="0" textAlign="center" width={300}>
+            <tr>Ahumada Cordero Daniela Sofía</tr>
+            <tr>Guevara Nambo Emilio</tr>
+            <tr>Ramírez Martínez Shareni</tr>
+          </table>
+        </div>
+        <input
+          type="text"
+          placeholder="Usuario"
+          value={user}
+          onChange={(e) => setUser(e.target.value)}
+          style={{ margin: "10px 0", padding: "10px", width: "100%" }}
+        />
+        <br />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ margin: "10px 0", padding: "10px", width: "100%" }}
+        />
+        <br />
+        <button
+          onClick={handleLogin}
+          style={{ padding: "10px 20px", width: "100%" }}
+        >
+          Iniciar sesión
+        </button>
+      </div>
+      {/* Contenedor para que los toasts se muestren */}
+      <ToastContainer />
+    </div>
+  );
+}
+
+export default Login;
