@@ -61,9 +61,11 @@ function Login() {
         </p>
         <div style={{ fontSize: "14px", marginBottom: "10px" }}>
           <table border="0" textAlign="center" width={300}>
-            <tr>Ahumada Cordero Daniela Sofía</tr>
-            <tr>Guevara Nambo Emilio</tr>
-            <tr>Ramírez Martínez Shareni</tr>
+            <tbody>
+            <tr><td>Ahumada Cordero Daniela Sofía</td></tr>
+            <tr><td>Guevara Nambo Emilio</td></tr>
+            <tr><td>Ramírez Martínez Shareni</td></tr>
+            </tbody>
           </table>
         </div>
         <input
