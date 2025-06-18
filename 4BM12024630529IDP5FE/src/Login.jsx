@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useNavigate } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  //const navigate = useNavigate();
 
   const handleLogin = () => {
     fetch(`http://localhost:9999/?User=${user}&password=${password}`)
@@ -15,6 +16,7 @@ function Login() {
             position: "top-center",
             autoClose: 3000,
           });
+          //navigate("/Home")
         } else {
           toast.error("Usuario o contraseña incorrectos.", {
             position: "top-center",

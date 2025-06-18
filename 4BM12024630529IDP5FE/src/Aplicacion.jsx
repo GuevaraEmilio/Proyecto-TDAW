@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import ReactDOM from "react-dom";
-// Importamos el componente
-import Hola from './Hola.jsx';
 import Login from './Login.jsx';
 import { createRoot } from 'react-dom/client';
+import 'materialize-css/dist/css/materialize.min.css';
+import 'materialize-css/dist/js/materialize.min.js';
  
 class Aplicacion extends React.Component {
   render() {
