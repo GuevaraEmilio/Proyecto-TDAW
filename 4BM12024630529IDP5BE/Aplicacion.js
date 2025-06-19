@@ -47,8 +47,7 @@ http
               tipo: foundUser.type_user,
               id: foundUser.id,
               username: foundUser.username,
-              email: foundUser.email, // <-- agrega email aquí
-              // Puedes agregar más campos si quieres
+              email: foundUser.email, 
             })
           );
         } else {
