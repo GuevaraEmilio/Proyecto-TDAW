@@ -20,7 +20,8 @@ const User = sequelize.define('User', {
   type_user: {
     type: DataTypes.STRING,
     allowNull: false,
-    field: 'TYPE_USER'
+    field: 'TYPE_USER', 
+    defaultValue: 'user'
   }
 }, {
   tableName: 'users',

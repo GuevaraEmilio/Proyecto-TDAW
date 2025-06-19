@@ -20,11 +20,12 @@ function Login() {
           });
           setTimeout(() => {
             if (data.tipo === "admin") {
-              history.push("/Home", {user:userData});
+              history.push("/Home", { user: data });
             } else if (data.tipo === "user") {
-              history.push("/Perfil", {user:{username: user, tipo:data.tipo}});
+              history.push("/Perfil", {user:data});
             }
           }, 3000);
+
           //navigate("/Home")
         } else {
           toast.error("Usuario o contraseña incorrectos.", {

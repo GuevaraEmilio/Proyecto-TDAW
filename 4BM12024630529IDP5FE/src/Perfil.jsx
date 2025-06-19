@@ -3,7 +3,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 function Perfil(props) {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
-
+  const [userId, setUserId] = useState(null);
   useEffect(() => {
     // Revisamos si llegó el usuario desde history.push
     const user = props.location.state?.user;
@@ -11,27 +11,57 @@ function Perfil(props) {
     if (user) {
       setForm({
         username: user.username,
-        email: "",  // si tienes el email en user, ponlo aquí
+        email: user.email,
         password: "",
       });
+      setUserId(user.id);
     } else {
       // Si no hay usuario, redirige al login
       props.history.push("/");
     }
   }, [props.location.state, props.history]);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleUpdate = () => {
-    toast.success("Datos actualizados (simulado)");
-  };
+  if (!userId) return;
+
+  fetch(`http://localhost:9999/users/${userId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: form.password }), // Solo cambia la contraseña
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Error al actualizar");
+      return res.json();
+    })
+    .then(() => {
+      toast.success("Contraseña actualizada exitosamente");
+      setForm({ ...form, password: "" });
+    })
+    .catch(() => toast.error("No se pudo actualizar la contraseña"));
+};
 
   const handleDelete = () => {
-    if (window.confirm("¿Seguro quieres eliminar tu cuenta?")) {
-      toast.success("Cuenta eliminada (simulado)");
-      props.history.push("/");
-    }
-  };
+  if (!userId) return;
+
+  if (window.confirm("¿Seguro quieres eliminar tu cuenta?")) {
+    fetch(`http://localhost:9999/users/${userId}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al eliminar");
+        return res.json();
+      })
+      .then(() => {
+        toast.success("Cuenta eliminada exitosamente");
+        setTimeout(() => props.history.push("/"), 2000);
+      })
+      .catch(() => toast.error("No se pudo eliminar la cuenta"));
+  }
+};
+
 
   return (
     <div style={{ padding: 20 }}>

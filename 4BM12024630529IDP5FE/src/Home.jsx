@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 function Home() {
   const [users, setUsers] = useState([]);
-  const [form, setForm] = useState({ username: "", email: "" });
+  const [form, setForm] = useState({ username: "", email: "", type_user: "user" });
   const [editId, setEditId] = useState(null); // id del usuario en edición
 
   // Cargar usuarios al montar
@@ -46,7 +46,7 @@ function Home() {
         })
         .then(() => {
           toast.success("Usuario creado");
-          setForm({ username: "", email: "" });
+          setForm({ username: "", email: "", password: "" });
           fetchUsers();
         })
         .catch(() => toast.error("Error creando usuario"));
@@ -63,7 +63,7 @@ function Home() {
         })
         .then(() => {
           toast.success("Usuario actualizado");
-          setForm({ username: "", email: "" });
+          setForm({ username: "", email: "" , password: ""});
           setEditId(null);
           fetchUsers();
         })
@@ -106,7 +106,7 @@ function Home() {
     >
       <div
         style={{
-          maxWidth: "600px",
+          maxWidth: "75%",
           margin: "0 auto",
           backgroundColor: "rgba(255, 255, 255, 0.95)",
           borderRadius: "10px",
@@ -123,15 +123,32 @@ function Home() {
             placeholder="Usuario"
             value={form.username}
             onChange={handleChange}
-            style={{ marginRight: "10px", padding: "8px", width: "40%" }}
+            style={{ marginRight: "10px", padding: "8px", width: "20%" }}
           />
           <input
             name="email"
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            style={{ marginRight: "10px", padding: "8px", width: "40%" }}
+            style={{ marginRight: "10px", padding: "8px", width: "20%" }}
           />
+          <input
+            name="password"
+            placeholder="Contraseña"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            style={{ marginRight: "10px", padding: "8px", width: "20%" }}
+          />
+          <select
+            name="type_user"
+            value={form.type_user}
+            onChange={handleChange}
+            style={{ marginBottom: "10px", padding: "8px", width: "20%" }}
+          >
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
           <button type="submit" style={{ padding: "8px 16px" }}>
             {editId === null ? "Crear" : "Actualizar"}
           </button>
@@ -139,7 +156,7 @@ function Home() {
             <button
               type="button"
               onClick={() => {
-                setForm({ username: "", email: "" });
+                setForm({ username: "", email: "", password: "" });
                 setEditId(null);
               }}
               style={{ marginLeft: "10px", padding: "8px 16px" }}
