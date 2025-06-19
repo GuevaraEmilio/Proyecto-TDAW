@@ -1,11 +1,13 @@
-import React, { useState, useNavigate } from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom"; // <- ESTE es el correcto
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
-  //const navigate = useNavigate();
+  const history = useHistory();
 
   const handleLogin = () => {
     fetch(`http://localhost:9999/?User=${user}&password=${password}`)
@@ -16,6 +18,13 @@ function Login() {
             position: "top-center",
             autoClose: 3000,
           });
+          setTimeout(() => {
+            if (data.tipo === "admin") {
+              history.push("/Home", {user:userData});
+            } else if (data.tipo === "user") {
+              history.push("/Perfil", {user:{username: user, tipo:data.tipo}});
+            }
+          }, 3000);
           //navigate("/Home")
         } else {
           toast.error("Usuario o contraseña incorrectos.", {
@@ -53,7 +62,7 @@ function Login() {
           padding: "40px",
           borderRadius: "10px",
           boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)",
-          textAlign: "center"//,
+          textAlign: "center", //,
           //width: "300px",
         }}
       >
@@ -64,9 +73,15 @@ function Login() {
         <div style={{ fontSize: "14px", marginBottom: "10px" }}>
           <table border="0" textAlign="center" width={300}>
             <tbody>
-            <tr><td>Ahumada Cordero Daniela Sofía</td></tr>
-            <tr><td>Guevara Nambo Emilio</td></tr>
-            <tr><td>Ramírez Martínez Shareni</td></tr>
+              <tr>
+                <td>Ahumada Cordero Daniela Sofía</td>
+              </tr>
+              <tr>
+                <td>Guevara Nambo Emilio</td>
+              </tr>
+              <tr>
+                <td>Ramírez Martínez Shareni</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -92,6 +107,12 @@ function Login() {
         >
           Iniciar sesión
         </button>
+        <p style={{ marginTop: "15px" }}>
+          ¿No tienes cuenta?{" "}
+          <Link to="/Register" style={{ color: "blue", cursor: "pointer" }}>
+            Regístrate aquí
+          </Link>
+        </p>
       </div>
       {/* Contenedor para que los toasts se muestren */}
       <ToastContainer />

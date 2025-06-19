@@ -12,6 +12,11 @@ const User = sequelize.define('User', {
     allowNull: false,
     field: 'PASSWORD'
   },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    field: 'EMAIL'  // Asegúrate que esta columna exista en tu base de datos
+  },
   type_user: {
     type: DataTypes.STRING,
     allowNull: false,

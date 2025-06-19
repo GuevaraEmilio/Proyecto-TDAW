@@ -1,24 +1,21 @@
-import React, { Component } from 'react';
-import ReactDOM from "react-dom";
-import Login from './Login.jsx';
-import { createRoot } from 'react-dom/client';
-import 'materialize-css/dist/css/materialize.min.css';
-import 'materialize-css/dist/js/materialize.min.js';
- 
-class Aplicacion extends React.Component {
-  render() {
-    return (
-    <div>
-      <Login />                  
-    </div>    
-    );
-  }
+import React from "react";
+import { Route, Switch } from "react-router-dom";
+import Login from "./Login.jsx";
+import Home from "./Home.jsx";
+import Register from "./Register.jsx";
+import Perfil from "./Perfil.jsx";
+import "materialize-css/dist/css/materialize.min.css";
+import "materialize-css/dist/js/materialize.min.js";
+
+function Aplicacion() {
+  return (
+    <Switch>
+     <Route exact path="/" component={Login} />
+        <Route path="/Home" component={Home} />
+        <Route path="/Perfil" component={Perfil} />
+        <Route path="/Register" component={Register} />
+    </Switch>
+  );
 }
- 
+
 export default Aplicacion;
-
-//CODIGO ACTUALIZADO PAREA LA NUEVA VERSION DE REACT
-const rootElement = document.getElementById("app");
-const root = createRoot(rootElement);
-root.render(<Aplicacion />);
-
