@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
@@ -10,6 +11,10 @@ module.exports = {
   },
   resolve: {
     extensions: [".js", ".jsx"],
+    fallback: {
+      fs: false,
+      util: require.resolve("util/")
+    }
   },
   module: {
     rules: [
@@ -28,6 +33,9 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "./public/index.html",
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
     }),
   ],
   devServer: {

@@ -6,8 +6,13 @@ import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const [user, setUser] = useState("");
+  const [name, setName] = useState("Invitado");
   const [password, setPassword] = useState("");
   const history = useHistory();
+
+  const handleLogin2 = () => {
+    history.push("/jugar");
+  }
 
   const handleLogin = () => {
     fetch(`http://localhost:9999/?User=${user}&password=${password}`)
@@ -86,7 +91,7 @@ function Login() {
             </tbody>
           </table>
         </div>
-        <input
+       {/* <input
           type="text"
           placeholder="Usuario"
           value={user}
@@ -101,9 +106,17 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           style={{ margin: "10px 0", padding: "10px", width: "100%" }}
         />
+        <br />*/}
+        <input
+          type="password"
+          placeholder="invitado"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{ margin: "10px 0", padding: "10px", width: "100%" }}
+        />
         <br />
         <button
-          onClick={handleLogin}
+          onClick={handleLogin2}
           style={{ padding: "10px 20px", width: "100%" }}
         >
           Iniciar sesión
