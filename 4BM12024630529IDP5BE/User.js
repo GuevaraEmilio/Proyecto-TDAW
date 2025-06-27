@@ -2,29 +2,18 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('./db');
 
 const User = sequelize.define('User', {
-  username: {
+  user: {
     type: DataTypes.STRING,
     allowNull: false,
-    field: 'USERNAME'
+    field: 'USER'
   },
-  password: {
-    type: DataTypes.STRING,
+  score: {
+    type: DataTypes.INTEGER,
     allowNull: false,
-    field: 'PASSWORD'
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    field: 'EMAIL'  // Asegúrate que esta columna exista en tu base de datos
-  },
-  type_user: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    field: 'TYPE_USER', 
-    defaultValue: 'user'
+    field: 'SCORE'
   }
 }, {
-  tableName: 'users',
+  tableName: 'highScores',
   timestamps: false
 });
 

@@ -10,7 +10,8 @@ USE login_db;
     --type_user VARCHAR(50) NOT NULL);
 
 CREATE TABLE IF NOT EXISTS highScores (
-    user VARCHAR(10) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user VARCHAR(10) NOT NULL,
     score INT NOT NULL
 );
 

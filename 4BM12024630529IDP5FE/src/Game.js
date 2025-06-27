@@ -141,7 +141,6 @@ const {name} = location.nm || {};
 
   //Agrega el puntaje logrado a la base de datos una vez que el juego termina
   const addScore = async(e) => {
-    e.preventDefault();
     try {
         await fetch('http://localhost:9999/highscores', {
         method: 'POST',
