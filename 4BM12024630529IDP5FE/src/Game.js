@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 import * as tf from "@tensorflow/tfjs";
 import * as speechCommands from "@tensorflow-models/speech-commands";
 import "./App.css";
@@ -17,14 +18,26 @@ const OBJ_GAP = 200;
 const OBJ_SPEED = 6;
 
 const Game = () => {
+
+const location = useLocation();
+const {name} = location.nm || {};
+
   const [recognizer, setRecognizer] = useState(null);
   const [birdpos, setBirdpos] = useState(200);
   const [isStart, setStart] = useState(false);
   const [objHeight, setObjHeight] = useState(200);
   const [objPos, setObjPos] = useState(200);
+  const [records, setRecords] = useState([]);
   const [score, setScore] = useState(0);
   const [isListening, setListening] = useState(false);
   const bottomObj = WALL_HEIGHT - OBJ_GAP - objHeight;
+
+   useEffect(() => {
+    fetch('http://localhost:9999/highscores')
+      .then(response => response.json())
+      .then(data => setRecords(data))
+      .catch(err => console.error('Error al obtener los puntajes:', err));
+  }, []);
 
   //Se carga el modelo de IA al montar el componente
   useEffect(() => {
@@ -71,6 +84,7 @@ const Game = () => {
       (topObj || bottomObj)
     ) {
       setStart(false);
+      addScore();
       if (isListening) {
         recognizer.stopListening();
         setListening(false);
@@ -125,9 +139,28 @@ const Game = () => {
     // }
   };
 
+  //Agrega el puntaje logrado a la base de datos una vez que el juego termina
+  const addScore = async(e) => {
+    e.preventDefault();
+    try {
+        await fetch('http://localhost:9999/highscores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, score: parseInt(score) }),
+      });
+    } catch (err) {
+      console.error('Error al enviar puntaje:', err);
+    }
+  };
+
   return (
     <Home onClick={handler}>
       <span>Score: {score}</span>
+      <div><table><th><td>Nombre</td><td>Puntaje</td></th>
+      <tbody>
+      {records.map(({user, score}) => {
+        <tr><td>user</td><td>scrore</td></tr>
+      })}</tbody></table></div>
       <Background height={WALL_HEIGHT} width={WALL_WIDTH}>
         {!isStart ? <StartGame>Click to start</StartGame> : null}
         <Obj
