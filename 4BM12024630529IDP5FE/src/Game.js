@@ -18,9 +18,8 @@ const OBJ_GAP = 200;
 const OBJ_SPEED = 6;
 
 const Game = () => {
-
-const location = useLocation();
-const {name} = location.nm || {};
+  const location = useLocation();
+  const { name, id } = location.state || {};
 
   const [recognizer, setRecognizer] = useState(null);
   const [birdpos, setBirdpos] = useState(200);
@@ -32,11 +31,11 @@ const {name} = location.nm || {};
   const [isListening, setListening] = useState(false);
   const bottomObj = WALL_HEIGHT - OBJ_GAP - objHeight;
 
-   useEffect(() => {
-    fetch('http://localhost:9999/highscores')
-      .then(response => response.json())
-      .then(data => setRecords(data))
-      .catch(err => console.error('Error al obtener los puntajes:', err));
+  useEffect(() => {
+    fetch("http://localhost:9999/score")
+      .then((response) => response.json())
+      .then((data) => setRecords(data))
+      .catch((err) => console.error("Error al obtener los puntajes:", err));
   }, []);
 
   //Se carga el modelo de IA al montar el componente
@@ -97,6 +96,7 @@ const {name} = location.nm || {};
   const loadModel = async () => {
     const recognizer = speechCommands.create("BROWSER_FFT", "directional4w");
     await recognizer.ensureModelLoaded();
+    console.log("Etiquetas del modelo:", recognizer.wordLabels()); 
     setRecognizer(recognizer);
     console.log("Modelo de reconocimiento de voz cargado");
     console.log(recognizer.wordLabels());
@@ -140,26 +140,46 @@ const {name} = location.nm || {};
   };
 
   //Agrega el puntaje logrado a la base de datos una vez que el juego termina
-  const addScore = async(e) => {
+  const addScore = async (e) => {
     try {
-        await fetch('http://localhost:9999/highscores', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, score: parseInt(score) }),
+      await fetch("http://localhost:9999/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id, score: parseInt(score) }),
       });
     } catch (err) {
-      console.error('Error al enviar puntaje:', err);
+      console.error("Error al enviar puntaje:", err);
     }
   };
 
   return (
     <Home onClick={handler}>
       <span>Score: {score}</span>
-      <div><table><th><td>Nombre</td><td>Puntaje</td></th>
-      <tbody>
-      {records.map(({user, score}) => {
-        <tr><td>user</td><td>scrore</td></tr>
-      })}</tbody></table></div>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Puntaje</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {records.length > 0 ? (
+              records.map(({ username, score }, index) => (
+                <tr key={index}>
+                  <td>{username}</td>
+                  <td>{score}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="2">No hay registros aún</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       <Background height={WALL_HEIGHT} width={WALL_WIDTH}>
         {!isStart ? <StartGame>Click to start</StartGame> : null}
         <Obj

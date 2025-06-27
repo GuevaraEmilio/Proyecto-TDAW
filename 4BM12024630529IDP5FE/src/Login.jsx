@@ -11,7 +11,7 @@ function Login() {
   const history = useHistory();
 
   const handleLogin2 = () => {
-    history.push({pathname:"/jugar", nm:{name}});
+    history.push("/jugar", {name});
   }
 
   const handleLogin = () => {
