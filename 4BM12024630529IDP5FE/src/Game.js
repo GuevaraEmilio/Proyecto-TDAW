@@ -16,6 +16,7 @@ const GRAVITY = 5;
 const OBJ_WIDTH = 20;
 const OBJ_GAP = 200;
 const OBJ_SPEED = 6;
+const y = WALL_HEIGHT - BIRD_HEIGHT;
 
 const Game = () => {
   const location = useLocation();
@@ -42,10 +43,6 @@ const Game = () => {
   useEffect(() => {
     loadModel();
   }, []);
-
-  // useEffect(() => {
-  //   listenCommand();
-  // }, []);
 
   // useEffect(() => {
   //   let birdval;
@@ -96,7 +93,7 @@ const Game = () => {
   const loadModel = async () => {
     const recognizer = speechCommands.create("BROWSER_FFT", "directional4w");
     await recognizer.ensureModelLoaded();
-    console.log("Etiquetas del modelo:", recognizer.wordLabels()); 
+    console.log("Etiquetas del modelo:", recognizer.wordLabels());
     setRecognizer(recognizer);
     console.log("Modelo de reconocimiento de voz cargado");
     console.log(recognizer.wordLabels());
@@ -104,13 +101,13 @@ const Game = () => {
 
   const listenCommand = async () => {
     if (!recognizer) return;
+
     recognizer.listen(
       (result) => {
         let command = result.scores.indexOf(Math.max(...result.scores));
         console.log("command: ", result.scores);
         console.log(command);
-        console.log("pasto");
-        if (command === 0 && isStart && birdpos < WALL_HEIGHT - BIRD_HEIGHT) {
+        if (command === 0 && (birdpos < y)) {
           setBirdpos((birdpos) => birdpos + 50);
         }
         if (command === 3) {
@@ -132,6 +129,9 @@ const Game = () => {
       setStart(true);
       listenCommand();
     }
+    // else{
+    //   setBirdpos((birdpos) => birdpos + 50);
+    // }
     //  else if (birdpos < BIRD_HEIGHT) {
     //   setBirdpos(0);
     // } else {
