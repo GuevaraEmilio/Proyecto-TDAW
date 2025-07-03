@@ -28,15 +28,14 @@ INSERT INTO users (USERNAME, PASSWORD, EMAIL, TYPE_USER) VALUES
 ('gamer_x', 'password1', 'gamerx@mail.com', 'user');
 
 INSERT INTO scores (SCORE, USER_ID) VALUES
-(120, 1),  -- daniela
-(250, 2),  -- emilio
-(180, 3),  -- shareni
+(10, 1),  -- daniela
+(20, 2),  -- emilio
+(10, 3),  -- shareni
 (90, 4),   -- invitado1
-(300, 5),  -- gamer_x
-(160, 1),  -- daniela
-(270, 2),  -- emilio
+(30, 5),  -- gamer_x
+(60, 1),  -- daniela
+(70, 2),  -- emilio
 (100, 3),  -- shareni
-(110, 4),  -- invitado1
 (320, 5);  -- gamer_x
 /*--INSERT INTO users (username, password, email, type_user) VALUES ('admin', '1234', 'admin@mail.com', 'admin');
 INSERT INTO highScores(user, score) VALUES ('mil', '30');

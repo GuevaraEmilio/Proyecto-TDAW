@@ -8,8 +8,8 @@ const Score = require("./Score");
 const decoder = new StringDecoder("utf-8");
 
 // Configurar las relaciones
-User.hasMany(Score, { foreignKey: "userId" });
-Score.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(Score, { foreignKey: "userId", as: "scores" });
+Score.belongsTo(User, { foreignKey: "userId", as: "user" });
 
 http
   .createServer(async function (request, response) {
@@ -45,7 +45,9 @@ http
         const { User: username, password } = parsedUrl.query;
         console.log("Intento de login:", username, password);
         try {
-          const foundUser = await User.findOne({ where: { username, password } });
+          const foundUser = await User.findOne({
+            where: { username, password },
+          });
           console.log("Resultado de búsqueda:", foundUser);
           response.writeHead(200, { "Content-Type": "application/json" });
           if (foundUser) {
@@ -71,44 +73,81 @@ http
 
       // Rutas de puntajes
       // GET /highscores: devuelve top 10 puntajes globales
+      // GET /score
+      // GET /score
       else if (pathname === "/score" && method === "GET") {
+        const scores = await Score.findAll({
+          include: [{ model: User, as: "user", attributes: ["username"] }],
+          order: [["score", "DESC"]],
+          limit: 10,
+        });
+
+        const formattedScores = scores.map((s) => ({
+          username: s.user.username,
+          score: s.score,
+        }));
+
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify(formattedScores));
+      }
+
+      //Scores
+      else if (
+        pathname === "/score/user" &&
+        method === "GET" &&
+        parsedUrl.query.id
+      ) {
+        const userId = parsedUrl.query.id;
+
         try {
           const scores = await Score.findAll({
-            include: [{ model: User, attributes: ["username"] }],
+            where: { userId },
+            include: [{ model: User, as: "user", attributes: ["username"] }],
             order: [["score", "DESC"]],
             limit: 10,
           });
 
-          // Formatear respuesta como array de objetos
-          const formattedScores = scores.map((s) => ({
-            username: s.User.username,
+          const formatted = scores.map((s) => ({
+            username: s.user.username,
             score: s.score,
           }));
 
           response.writeHead(200, { "Content-Type": "application/json" });
-          response.end(JSON.stringify(formattedScores));
+          response.end(JSON.stringify(formatted));
         } catch (err) {
-          console.error("Error al obtener puntajes:", err);
+          console.error("Error al obtener puntajes del usuario:", err);
           response.writeHead(500, { "Content-Type": "application/json" });
-          response.end(JSON.stringify([])); // Devolver array vacío en caso de error
+          response.end(JSON.stringify([]));
         }
       }
-      // POST /highscores: agrega un puntaje enviando { user, score }
-      else if (pathname === "/score" && method === "POST") {
+
+      //Método POST para scores
+      else if (pathname === "/scores" && method === "POST") {
         let body = "";
         request.on("data", (chunk) => (body += decoder.write(chunk)));
         request.on("end", async () => {
           body += decoder.end();
-          const { user, score } = JSON.parse(body);
-          const foundUser = await User.findOne({ where: { username: user } });
-          if (!foundUser) {
-            response.writeHead(404, { "Content-Type": "application/json" });
-            response.end(JSON.stringify({ error: "Usuario no encontrado" }));
-            return;
+          try {
+            const { userId, score } = JSON.parse(body);
+
+            if (!userId || score == null) {
+              response.writeHead(400, { "Content-Type": "application/json" });
+              response.end(
+                JSON.stringify({ error: "Faltan datos: userId o score" })
+              );
+              return;
+            }
+
+            const newScore = await Score.create({ userId, score });
+            response.writeHead(201, { "Content-Type": "application/json" });
+            response.end(JSON.stringify(newScore));
+          } catch (err) {
+            console.error("Error en POST /score:", err);
+            response.writeHead(500, { "Content-Type": "application/json" });
+            response.end(
+              JSON.stringify({ error: "Error interno al guardar puntaje" })
+            );
           }
-          const newScore = await Score.create({ userId: foundUser.id, score });
-          response.writeHead(201, { "Content-Type": "application/json" });
-          response.end(JSON.stringify(newScore));
         });
       }
 

@@ -231,7 +231,7 @@ const Home = styled.div`
   align-item: center;
 `;
 const Background = styled.div`
-  background-image: url(./images/bg.png);
+  background-image: url(./images/fondo.jpg);
   background-repeat: no-repeat;
   background-size: ${(props) => props.width}px ${(props) => props.height}px;
   width: ${(props) => props.width}px;
@@ -242,7 +242,7 @@ const Background = styled.div`
 `;
 const Bird = styled.div`
   position: absolute;
-  background-image: url("/images/pajaro.png"); // Usa ruta absoluta desde public/
+  background-image: url("/images/tiburon.png"); // Usa ruta absoluta desde public/
   background-repeat: no-repeat;
   background-size: ${(props) => props.width}px ${(props) => props.height}px;
   width: ${(props) => props.width}px;
