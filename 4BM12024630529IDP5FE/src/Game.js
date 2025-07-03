@@ -161,69 +161,6 @@ const Game = () => {
     }
   };
 
-  useEffect(() => {
-    let audioContext;
-    let analyser;
-    let dataArray;
-    let source;
-    let animationId;
-
-    async function startMicVolume() {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      source = audioContext.createMediaStreamSource(stream);
-      analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-      function checkVolume() {
-        analyser.getByteTimeDomainData(dataArray);
-        // Calcula el volumen RMS
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          let val = (dataArray[i] - 128) / 128;
-          sum += val * val;
-        }
-        const rms = Math.sqrt(sum / dataArray.length);
-
-        // Si el volumen supera el umbral, mueve el personaje hacia arriba
-        if (rms > 0.08 && isStart) {
-          setBirdpos((pos) => Math.max(0, pos - 40));
-        }
-
-        animationId = requestAnimationFrame(checkVolume);
-      }
-
-      checkVolume();
-    }
-
-    if (isStart) {
-      startMicVolume();
-    }
-
-    // Limpieza: solo intenta detener el recognizer si está escuchando realmente
-    return () => {
-      if (audioContext) audioContext.close();
-      if (animationId) cancelAnimationFrame(animationId);
-      // Solo intenta detener el recognizer si existe y está escuchando
-      if (
-        recognizer &&
-        typeof recognizer.stopListening === "function" &&
-        typeof recognizer.isListening === "function"
-      ) {
-        // isListening() es síncrono y retorna un booleano
-        if (recognizer.isListening()) {
-          try {
-            recognizer.stopListening();
-          } catch (e) {
-            // Ignora el error si no estaba escuchando
-          }
-        }
-      }
-    };
-  }, [isStart]);
-
   return (
     <GameWrapper>
       <GameInfoBox>
@@ -294,7 +231,7 @@ const Home = styled.div`
   align-item: center;
 `;
 const Background = styled.div`
-  background-image: url(./images/fondojuego.jpg);
+  background-image: url(./images/bg.png);
   background-repeat: no-repeat;
   background-size: ${(props) => props.width}px ${(props) => props.height}px;
   width: ${(props) => props.width}px;
@@ -305,7 +242,7 @@ const Background = styled.div`
 `;
 const Bird = styled.div`
   position: absolute;
-  background-image: url("/images/tiburon.png"); // Usa ruta absoluta desde public/
+  background-image: url("/images/pajaro.png"); // Usa ruta absoluta desde public/
   background-repeat: no-repeat;
   background-size: ${(props) => props.width}px ${(props) => props.height}px;
   width: ${(props) => props.width}px;
