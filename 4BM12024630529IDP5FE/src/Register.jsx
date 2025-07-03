@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useHistory } from "react-router-dom"; // Cambia useNavigate por useHistory
 
 function Register() {
   const [form, setForm] = useState({
@@ -9,6 +10,7 @@ function Register() {
     password: "",
     confirmPassword: "",
   });
+  const history = useHistory(); // Cambia useNavigate por useHistory
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -34,7 +36,7 @@ function Register() {
         username: form.username,
         email: form.email,
         password: form.password,
-        type_user: "user",  // Por defecto, o puedes poner selector para tipo
+        type_user: "user",
       }),
     })
       .then((res) => {
@@ -60,63 +62,84 @@ function Register() {
         alignItems: "center",
       }}
     >
-      <form
-        onSubmit={handleRegister}
-        style={{
-          backgroundColor: "rgba(255,255,255,0.9)",
-          padding: "40px",
-          borderRadius: "10px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-          width: "400px",
-          textAlign: "center",
-        }}
-      >
-        <h2>Registrate</h2>
-        <p>
-          <strong>Proyecto: Videojuego controlado por voz</strong>
-        </p>
+      <div>
+        <form
+          onSubmit={handleRegister}
+          style={{
+            backgroundColor: "rgba(255,255,255,0.9)",
+            padding: "40px",
+            borderRadius: "10px",
+            boxShadow: "0 0 10px rgba(0,0,0,0.3)",
+            width: "400px",
+            textAlign: "center",
+          }}
+        >
+          <h2>Registrate</h2>
+          <p>
+            <strong>Proyecto: Videojuego controlado por voz</strong>
+          </p>
 
-        <input
-          type="text"
-          name="username"
-          placeholder="Usuario"
-          value={form.username}
-          onChange={handleChange}
-          style={{ marginBottom: "10px", width: "100%", padding: "10px" }}
-        />
+          <input
+            type="text"
+            name="username"
+            placeholder="Usuario"
+            value={form.username}
+            onChange={handleChange}
+            style={{ marginBottom: "10px", width: "100%", padding: "10px" }}
+          />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          style={{ marginBottom: "10px", width: "100%", padding: "10px" }}
-        />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            style={{ marginBottom: "10px", width: "100%", padding: "10px" }}
+          />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Contraseña"
-          value={form.password}
-          onChange={handleChange}
-          style={{ marginBottom: "10px", width: "100%", padding: "10px" }}
-        />
+          <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            value={form.password}
+            onChange={handleChange}
+            style={{ marginBottom: "10px", width: "100%", padding: "10px" }}
+          />
 
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirmar contraseña"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          style={{ marginBottom: "20px", width: "100%", padding: "10px" }}
-        />
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirmar contraseña"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            style={{ marginBottom: "20px", width: "100%", padding: "10px" }}
+          />
 
-        <button type="submit" style={{ padding: "10px 20px", width: "100%" }}>
-          Registrarse
+          <button type="submit" style={{ padding: "10px 20px", width: "100%" }}>
+            Registrarse
+          </button>
+        </form>
+        {/* Botón para volver al inicio de sesión */}
+        <button
+          style={{
+            marginTop: "20px",
+            background: "rgba(255,255,255,0.7)", // blanco y opaco
+            color: "#333",
+            border: "none",
+            borderRadius: "5px",
+            padding: "10px 20px",
+            cursor: "pointer",
+            fontSize: "16px",
+            width: "100%",
+            fontWeight: "bold",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          }}
+          onClick={() => history.push("/")}
+        >
+          Volver al inicio de sesión
         </button>
-      </form>
-      <ToastContainer position="top-center" autoClose={3000} />
+        <ToastContainer position="top-center" autoClose={3000} />
+      </div>
     </div>
   );
 }

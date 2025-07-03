@@ -5,7 +5,9 @@ USE login_db;
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   USERNAME VARCHAR(255) NOT NULL UNIQUE,
-  PASSWORD VARCHAR(255) NOT NULL
+  PASSWORD VARCHAR(255) NOT NULL,
+  EMAIL VARCHAR(255) NOT NULL,
+  TYPE_USER VARCHAR(50) NOT NULL DEFAULT 'user'
 );
 
 CREATE TABLE scores (
@@ -18,12 +20,12 @@ CREATE TABLE scores (
 );
 
 
-INSERT INTO users (USERNAME, PASSWORD) VALUES
-('daniela', '1234'),
-('emilio', 'abcd'),
-('shareni', 'qwerty'),
-('invitado1', 'invitado'),
-('gamer_x', 'password1');
+INSERT INTO users (USERNAME, PASSWORD, EMAIL, TYPE_USER) VALUES
+('daniela', '1234', 'daniela@mail.com', 'admin'),
+('emilio', 'abcd', 'emilio@mail.com', 'user'),
+('shareni', 'qwerty', 'shareni@mail.com', 'user'),
+('invitado1', 'invitado', 'invitado1@mail.com', 'user'),
+('gamer_x', 'password1', 'gamerx@mail.com', 'user');
 
 INSERT INTO scores (SCORE, USER_ID) VALUES
 (120, 1),  -- daniela

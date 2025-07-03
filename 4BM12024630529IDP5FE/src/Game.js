@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import { useLocation, useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import * as tf from "@tensorflow/tfjs";
 import * as speechCommands from "@tensorflow-models/speech-commands";
 import "./App.css";
@@ -20,7 +20,16 @@ const y = WALL_HEIGHT - BIRD_HEIGHT;
 
 const Game = () => {
   const location = useLocation();
-  const { name, id } = location.state || {};
+  const history = useHistory();
+  // Obtén el nombre del usuario desde la navegación o localStorage
+  const username =
+    location.state?.user?.username ||
+    localStorage.getItem("username") ||
+    "Invitado";
+  const id =
+    location.state?.user?.id ||
+    location.state?.id ||
+    null;
 
   const [recognizer, setRecognizer] = useState(null);
   const [birdpos, setBirdpos] = useState(200);
@@ -152,35 +161,101 @@ const Game = () => {
     }
   };
 
-  return (
-    <Home onClick={handler}>
-      <span>Score: {score}</span>
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Puntaje</th>
-            </tr>
-          </thead>
+  useEffect(() => {
+    let audioContext;
+    let analyser;
+    let dataArray;
+    let source;
+    let animationId;
 
-          <tbody>
-            {records.length > 0 ? (
-              records.map(({ username, score }, index) => (
-                <tr key={index}>
-                  <td>{username}</td>
-                  <td>{score}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="2">No hay registros aún</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <Background height={WALL_HEIGHT} width={WALL_WIDTH}>
+    async function startMicVolume() {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      source = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      function checkVolume() {
+        analyser.getByteTimeDomainData(dataArray);
+        // Calcula el volumen RMS
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          let val = (dataArray[i] - 128) / 128;
+          sum += val * val;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+
+        // Si el volumen supera el umbral, mueve el personaje hacia arriba
+        if (rms > 0.08 && isStart) {
+          setBirdpos((pos) => Math.max(0, pos - 40));
+        }
+
+        animationId = requestAnimationFrame(checkVolume);
+      }
+
+      checkVolume();
+    }
+
+    if (isStart) {
+      startMicVolume();
+    }
+
+    // Limpieza: solo intenta detener el recognizer si está escuchando realmente
+    return () => {
+      if (audioContext) audioContext.close();
+      if (animationId) cancelAnimationFrame(animationId);
+      // Solo intenta detener el recognizer si existe y está escuchando
+      if (
+        recognizer &&
+        typeof recognizer.stopListening === "function" &&
+        typeof recognizer.isListening === "function"
+      ) {
+        // isListening() es síncrono y retorna un booleano
+        if (recognizer.isListening()) {
+          try {
+            recognizer.stopListening();
+          } catch (e) {
+            // Ignora el error si no estaba escuchando
+          }
+        }
+      }
+    };
+  }, [isStart]);
+
+  return (
+    <GameWrapper>
+      <GameInfoBox>
+        <div style={{ fontWeight: "bold", fontSize: "1.5rem", color: "#222" }}>
+          Nombre: {username}
+        </div>
+        <div
+          style={{
+            fontSize: "1.2rem",
+            color: "#222",
+            marginTop: "10px",
+            background: "rgba(0,0,0,0.08)", // 40% más opaco sobre blanco
+            borderRadius: "6px",
+            padding: "6px 12px",
+            display: "inline-block",
+          }}
+        >
+          Puntaje: {score}
+        </div>
+        <div style={{ marginTop: "18px", color: "#555" }}>
+          {records.length > 0 ? (
+            records.map(({ username, score }, index) => (
+              <div key={index}>
+                {username}: {score}
+              </div>
+            ))
+          ) : (
+            <div>No hay registros aún</div>
+          )}
+        </div>
+      </GameInfoBox>
+      <Background height={WALL_HEIGHT} width={WALL_WIDTH} onClick={handler}>
         {!isStart ? <StartGame>Click to start</StartGame> : null}
         <Obj
           height={objHeight}
@@ -203,7 +278,10 @@ const Game = () => {
           deg={0}
         />
       </Background>
-    </Home>
+      <BottomButton onClick={() => history.push("/")}>
+        Volver al inicio de sesión
+      </BottomButton>
+    </GameWrapper>
   );
 };
 
@@ -216,7 +294,7 @@ const Home = styled.div`
   align-item: center;
 `;
 const Background = styled.div`
-  background-image: url(./images/bg.png);
+  background-image: url(./images/fondojuego.jpg);
   background-repeat: no-repeat;
   background-size: ${(props) => props.width}px ${(props) => props.height}px;
   width: ${(props) => props.width}px;
@@ -227,7 +305,7 @@ const Background = styled.div`
 `;
 const Bird = styled.div`
   position: absolute;
-  background-image: url(./images/pajaro.png);
+  background-image: url("/images/tiburon.png"); // Usa ruta absoluta desde public/
   background-repeat: no-repeat;
   background-size: ${(props) => props.width}px ${(props) => props.height}px;
   width: ${(props) => props.width}px;
@@ -259,3 +337,62 @@ const Obj = styled.div`
   top: ${(props) => props.top}px;
   transform: rotate(${(props) => props.deg});
 `;
+
+// Agrega este styled-component para el fondo general
+const GameWrapper = styled.div`
+  min-height: 100vh;
+  width: 100vw;
+  background-image: url("/media/fondo2.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+`;
+
+// Caja blanca opaca para nombre y puntaje
+const GameInfoBox = styled.div`
+  position: fixed; // <-- Cambia a fixed
+  top: 40px;
+  left: 40px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 24px 36px;
+  min-width: 220px;
+  z-index: 10;
+  text-align: left;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  pointer-events: auto;
+`;
+const UserNameBox = styled.div`
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #222;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+`;
+const BottomButton = styled.button`
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  background: rgba(255,255,255,0.7);
+  color: #222;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  padding: 12px 32px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 20;
+`;
+

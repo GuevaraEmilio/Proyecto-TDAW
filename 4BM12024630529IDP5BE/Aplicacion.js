@@ -19,6 +19,7 @@ http
       "GET, POST, PUT, DELETE, OPTIONS"
     );
     response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type"); // <-- agrega esta línea
 
     if (request.method === "OPTIONS") {
       response.writeHead(200);
@@ -42,21 +43,30 @@ http
         parsedUrl.query.password
       ) {
         const { User: username, password } = parsedUrl.query;
-        const foundUser = await User.findOne({ where: { username, password } });
-        response.writeHead(200, { "Content-Type": "application/json" });
-        if (foundUser) {
-          response.end(
-            JSON.stringify({
-              status: "yes",
-              tipo: foundUser.type_user,
-              id: foundUser.id,
-              username: foundUser.username,
-              email: foundUser.email,
-            })
-          );
-        } else {
-          response.end(JSON.stringify({ status: "no", tipo: "nodefinido" }));
+        console.log("Intento de login:", username, password);
+        try {
+          const foundUser = await User.findOne({ where: { username, password } });
+          console.log("Resultado de búsqueda:", foundUser);
+          response.writeHead(200, { "Content-Type": "application/json" });
+          if (foundUser) {
+            response.end(
+              JSON.stringify({
+                status: "yes",
+                tipo: foundUser.type_user,
+                id: foundUser.id,
+                username: foundUser.username,
+                email: foundUser.email,
+              })
+            );
+          } else {
+            response.end(JSON.stringify({ status: "no", tipo: "nodefinido" }));
+          }
+        } catch (err) {
+          console.error("Error en login:", err);
+          response.writeHead(500, { "Content-Type": "application/json" });
+          response.end(JSON.stringify({ error: err.message }));
         }
+        return;
       }
 
       // Rutas de puntajes
